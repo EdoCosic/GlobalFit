@@ -1,0 +1,6 @@
+@GlobalFit.API_HostAddress = http://localhost:5093
+
+GET {{GlobalFit.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35122.118
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GlobalFit.API", "GlobalFit.API\GlobalFit.API.csproj", "{39D7EEA9-2C35-40F3-B26C-E832345C5520}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{39D7EEA9-2C35-40F3-B26C-E832345C5520}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39D7EEA9-2C35-40F3-B26C-E832345C5520}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39D7EEA9-2C35-40F3-B26C-E832345C5520}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39D7EEA9-2C35-40F3-B26C-E832345C5520}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {48829C59-7D68-4CD4-8AC4-55F82BDD4647}
+	EndGlobalSection
+EndGlobal
