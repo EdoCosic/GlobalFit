@@ -50,15 +50,7 @@ builder.Services.AddSwaggerGen(opt =>
     });
 });
 
-builder.Services.AddCors(opt =>
-{
-    opt.AddPolicy("DevCors", policy =>
-        policy.AllowAnyHeader().AllowAnyMethod().WithOrigins(
-            "http://localhost:5173",
-            "http://localhost:4200"
-        )
-    );
-});
+builder.Services.AddCors();
 
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
 builder.Services.AddScoped<ITokenService, TokenService>();
@@ -95,7 +87,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors("DevCors");
+app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod()
+    .WithOrigins("http://localhost:4200", "https://localhost:4200"));
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -14,6 +14,7 @@ namespace API.Controllers
     {
         // GET /api/members?Name=edo&Email=@gmail.com&Page=1&PageSize=10
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<IReadOnlyList<AppUser>>> GetMembers([FromQuery] MemberQuery q)
         {
             var query = context.Users.AsNoTracking().AsQueryable();
@@ -68,9 +69,10 @@ namespace API.Controllers
             
             return items;
         }
-        
+
         // GET /api/members/{id}
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<AppUser>> GetMember(string id)
         {
             var member = await context.Users.FindAsync(id);
