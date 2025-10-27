@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using API.Data;
 using API.Entities;
+using API.Extensions;
 using API.Models;
 using API.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -10,11 +11,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
-public class AccountController(AppDbContext context, ITokenService tokenService) : ControllerBase
+
+public class AccountController(AppDbContext context, ITokenService tokenService) : BaseApiController
 {
-    [HttpPost("register")]
+    [HttpPost("register")] //api/members/registery
     [AllowAnonymous]
     public async Task<ActionResult<UserDto>> Register(RegisterDto dto)
     {
@@ -35,13 +35,7 @@ public class AccountController(AppDbContext context, ITokenService tokenService)
         context.Users.Add(user);
         await context.SaveChangesAsync();
 
-        return new UserDto
-        {
-            Id = user.Id,
-            DisplayName = user.DisplayName,
-            Email = user.Email,
-            Token = tokenService.CreateToken(user)
-        };
+        return user.ToDto(tokenService);
     }
 
     [HttpPost("login")]
@@ -49,21 +43,15 @@ public class AccountController(AppDbContext context, ITokenService tokenService)
     public async Task<ActionResult<UserDto>> Login(LoginDto dto)
     {
         var user = await context.Users.SingleOrDefaultAsync(x => x.Email == dto.Email);
-        if (user is null) return Unauthorized("Invalid email or password.");
+        if (user is null) return Unauthorized("Invalid email address.");
 
         using var hmac = new HMACSHA512(user.PasswordSalt);
         var computed = hmac.ComputeHash(Encoding.UTF8.GetBytes(dto.Password));
 
         if (!computed.SequenceEqual(user.PasswordHash))
-            return Unauthorized("Invalid email or password.");
+            return Unauthorized("Invalid password.");
 
-        return new UserDto
-        {
-            Id = user.Id,
-            DisplayName = user.DisplayName,
-            Email = user.Email,
-            Token = tokenService.CreateToken(user)
-        };
+        return user.ToDto(tokenService);
     }
 
     

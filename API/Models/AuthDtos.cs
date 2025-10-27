@@ -25,8 +25,9 @@ public class LoginDto
 
 public class UserDto
 {
-    public string Id { get; set; } = string.Empty;
-    public string DisplayName { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
-    public string Token { get; set; } = string.Empty;
+    public required string Id { get; set; } = string.Empty;
+    public required string DisplayName { get; set; } = string.Empty;
+    public required string Email { get; set; } = string.Empty;
+    public string? ImageUrl { get; set; }
+    public required string Token { get; set; } = string.Empty;
 }

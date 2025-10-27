@@ -7,10 +7,8 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")] // /api/members
     [Authorize]
-    public class MembersController(AppDbContext context) : ControllerBase
+    public class MembersController(AppDbContext context) : BaseApiController
     {
         // GET /api/members?Name=edo&Email=@gmail.com&Page=1&PageSize=10
         [HttpGet]
@@ -84,7 +82,12 @@ namespace API.Controllers
         public async Task<ActionResult<AppUser>> CreateMember([FromBody] MemberCreateDto dto)
         {
             // [ApiController] će vratiti 400 ako validacija pada
-            var user = new AppUser { DisplayName = dto.DisplayName, Email = dto.Email };
+            var user = new AppUser {
+                DisplayName = dto.DisplayName,
+                Email = dto.Email,
+                PasswordHash = Array.Empty<byte>(),
+                PasswordSalt = Array.Empty<byte>()
+            };
 
             // (opcija) zaštita na nivou API-a za dupli email
             var emailTaken = await context.Users.AnyAsync(u => u.Email == dto.Email);
