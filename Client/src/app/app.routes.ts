@@ -8,20 +8,27 @@ import { Membership } from '../features/membership/membership';
 import { Program } from '../features/program/program';
 import { Shop } from '../features/shop/shop';
 import { Reviews } from '../features/reviews/reviews';
+import { authGuard } from '../core/guards/auth-guard';
 
 export const routes: Routes = [
-    {path:'',component: Home},
-    {path:'membership',component: Membership},
-    {path:'program',component: Program},
-    {path:'shop',component: Shop},
+    { path: '', component: Home },
+    {
+        path: '',
+        runGuardsAndResolvers: 'always',
+        canActivate: [authGuard],
+        children: [
+            { path: 'membership', component: Membership},
+            { path: 'program', component: Program },
+            { path: 'shop', component: Shop },
 
-    {path:'news',component: Messages},
-    {path:'reviews',component: Reviews},
+            { path: 'news', component: Messages },
+            { path: 'reviews', component: Reviews },
+        ]
+    },
 
+    { path: 'members', component: MemberList }, //ne koristi se nez hocu li koristi jos uvijek ( nek stoji za sad)
+    { path: 'members/:id', component: MemberDetailed }, //ne koristi se nez hocu li koristi jos uvijek ( nek stoji za sad)
+    { path: 'lists', component: Lists }, //ne koristi se nez hocu li koristi jos uvijek ( nek stoji za sad)
 
-    {path:'members',component: MemberList}, //ne koristi se nez hocu li koristi jos uvijek ( nek stoji za sad)
-    {path:'members/:id',component: MemberDetailed}, //ne koristi se nez hocu li koristi jos uvijek ( nek stoji za sad)
-    {path:'lists',component: Lists}, //ne koristi se nez hocu li koristi jos uvijek ( nek stoji za sad)
-
-    {path:'**',component: Home},
+    { path: '**', component: Home },
 ];
