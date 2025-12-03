@@ -3,17 +3,18 @@ import { HttpClient } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
 import { Nav } from "../layout/nav/nav";
 import { AccoutService } from '../core/services/accout-service';
-import { Home } from "../features/home/home";
 import { User } from '../types/user';
+import { Router, RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  imports: [Nav, Home],
+  imports: [Nav, RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class App implements OnInit{
   private accoutService = inject(AccoutService);
+  protected router = inject(Router);
   private http = inject(HttpClient);
   protected title = 'GlobalFit';
   protected members = signal<User[]>([]) 
