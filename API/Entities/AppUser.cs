@@ -11,7 +11,11 @@ public class AppUser
 
     [Required, MaxLength(200), EmailAddress]
     public required string Email { get; set; }
+    public string? ImageUrl { get; set; }
 
-    public required byte[] PasswordHash { get; set; } = Array.Empty<byte>();
-    public required byte[] PasswordSalt { get; set; } = Array.Empty<byte>();
+    public required byte[] PasswordHash { get; set; }
+    public required byte[] PasswordSalt { get; set; } 
+
+    //Navigation properties
+    public Member Member { get; set; } = null!;
 }
