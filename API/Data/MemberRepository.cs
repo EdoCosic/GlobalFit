@@ -14,10 +14,11 @@ namespace API.Data
 
         public async Task<IReadOnlyList<Member>> GetMembersAsync()
         {
-            return await context.Members.ToListAsync();
+            return await context.Members
+            .ToListAsync();
         }
 
-        public async Task<IReadOnlyList<Photo>> GetPhotosByMemberIdAsync(string memberId)
+        public async Task<IReadOnlyList<Photo>> GetPhotosForMemberAsync(string memberId)
         {
             return await context.Members
                 .Where(x => x.Id == memberId)
