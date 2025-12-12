@@ -1,1 +1,168 @@
-<p>membership works!</p>
+<div
+  class="hero-section relative left-1/2 -translate-x-1/2 w-screen h-[80vh] flex flex-col justify-center items-center text-center text-white"
+  style="
+    background:
+      linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)),
+      url('/membership-hero.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin-top: -28px;
+  "
+>
+  <h5 class="tracking-[4px] font-light mb-2">
+    MEMBERSHIP
+  </h5>
+
+  <h1 class="text-[42px] font-bold max-w-[900px]">
+    Choose the right GlobalFit membership
+  </h1>
+
+  <p class="mt-4 text-lg max-w-[700px]">
+    "{{ quote }}"
+  </p>
+</div>
+
+<div class="w-full pb-32">
+
+  <div class="w-full flex justify-start relative -top-[90px] -mb-10">
+    <div
+      class="w-[450px] bg-white ml-[60px] rounded-3xl px-9 py-8 shadow-[0_20px_50px_rgba(0,0,0,0.15)] flex flex-col gap-6"
+    >
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="m-0 text-[26px] font-bold">
+          MEMBERSHIP
+        </h2>
+
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-7 h-7 opacity-70"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z"
+          />
+        </svg>
+      </div>
+
+      <p class="size-13px text-[#888] mb-1">
+        Choose the plan that fits your routine.
+      </p>
+
+      <div
+        *ngFor="let plan of membershipPlans"
+        class="py-4 border-b border-[#e6e6e6] flex flex-col gap-1"
+      >
+        <div class="flex items-center gap-2">
+          <h3 class="m-0 text-[20px] font-semibold">
+            {{ plan.name | uppercase }}
+          </h3>
+
+          <span
+            *ngIf="plan.highlight"
+            class="badge badge-outline text-[10px] font-semibold tracking-wide"
+          >
+            {{ plan.highlight | uppercase }}
+          </span>
+        </div>
+
+        <div class="text-[20px] font-bold text-[#222]">
+          {{ plan.price }} {{ plan.currency }}
+          <span class="text-[13px] font-medium text-[#444]">
+            / {{ plan.period }}
+          </span>
+        </div>
+
+        <p class="text-[14px] text-[#666] m-0">
+          {{ plan.description }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="w-full flex justify-start relative -top-[450px]">
+    <div
+      class="bg-white rounded-3xl px-9 py-8 shadow-[0_20px_50px_rgba(0,0,0,0.10)] flex flex-col gap-5"
+      style="
+        width: calc(100% - 450px - 60px - 40px);
+        margin-left: calc(450px + 60px + 40px);
+        margin-right: 40px;
+      "
+    >
+      <h2 class="m-0 text-[24px] font-bold tracking-[1px]">
+        BMI CALCULATOR
+      </h2>
+
+      <p class="m-0 text-[14px] text-[#666]">
+        BMI is a measurement of a person's leanness or corpulence based on their height and weight,
+        and is intended to quantify tissue mass.
+      </p>
+
+      <div class="flex flex-wrap gap-4 items-end">
+        <div class="flex flex-col gap-1 basis-[150px]">
+          <label class="text-[13px] font-semibold text-[#444]">Height (cm)</label>
+          <input
+            #heightInput
+            type="number"
+            placeholder="e.g. 180"
+            class="px-3 py-2 rounded-[10px] border border-[#d0d0d0] text-[14px] outline-none"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1 basis-[150px]">
+          <label class="text-[13px] font-semibold text-[#444]">Weight (kg)</label>
+          <input
+            #weightInput
+            type="number"
+            placeholder="e.g. 75"
+            class="px-3 py-2 rounded-[10px] border border-[#d0d0d0] text-[14px] outline-none"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1 flex-1 min-w-[180px]">
+          <label class="text-[13px] font-semibold text-[#444]">Result</label>
+          <div
+            class="px-3 py-2 rounded-[10px] border border-[#e2dcff] bg-[#f5f3ff] text-[14px] min-h-10 flex items-center"
+          >
+            <span>{{ bmi !== null ? bmi : bmiError }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between gap-4 mt-1">
+        <button
+          (click)="calculateBMI(heightInput.value, weightInput.value)"
+          class="btn btn-neutral normal-case rounded-full px-6"
+        >
+          Calculate BMI
+        </button>
+
+        <p class="m-0 text-[12px] text-[#999] text-right max-w-[320px]">
+          You should not use this tool to diagnose any symptoms.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  class="relative left-1/2 -translate-x-1/2 w-screen"
+  style="margin-top: -420px;"
+>
+  <div class="w-full h-[420px]">
+    <iframe
+      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2901.0269355162654!2d17.807003576757733!3d43.355547171630434!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x134b439e0c65cb4d%3A0xbd11c66192f5a493!2sFakultet%20informacijskih%20tehnologija%20-%20UNMO!5e0!3m2!1sbs!2sba!4v1765553451155!5m2!1sbs!2sba"
+      width="100%"
+      height="100%"
+      style="border:0; display:block;"
+      allowfullscreen=""
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"
+    ></iframe>
+  </div>
+</div>

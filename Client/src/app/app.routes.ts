@@ -4,7 +4,7 @@ import { MemberList } from '../features/members/member-list/member-list';
 import { MemberDetailed } from '../features/members/member-detailed/member-detailed';
 import { Lists } from '../features/lists/lists';
 import { Messages } from '../features/messages/messages';
-import { Membership } from '../features/membership/membership';
+import { MembershipComponent } from '../features/membership/membership';
 import { Program } from '../features/program/program';
 import { Shop } from '../features/shop/shop';
 import { Reviews } from '../features/reviews/reviews';
@@ -20,7 +20,7 @@ export const routes: Routes = [
         runGuardsAndResolvers: 'always',
         canActivate: [authGuard],
         children: [
-            { path: 'membership', component: Membership},
+            { path: 'membership', component: MembershipComponent},
             { path: 'program', component: Program },
             { path: 'shop', component: Shop },
 
