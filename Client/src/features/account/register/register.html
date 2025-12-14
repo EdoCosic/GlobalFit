@@ -1,19 +1,25 @@
-<div class ="card bg-base-100 w-1/2 mx-auto flex flex-col p-6 rounded-lg shadow-lg">
-    <div class ="card-title justify-center text-3xl text-primary">Sign up</div>
-    <div class ="card-body w-full">
-        <form #registerForm="ngForm" class="flex flex-col gap-4 w-full" (ngSubmit)="register()">
-            <input class="input w-full" name="email" 
-            [(ngModel)]="creds.email" placeholder="Email">
-            <input class="input w-full" name="displayName" 
-            [(ngModel)]="creds.displayName" placeholder="Display Name">
-            <input type="password" class="input w-full" name="password" 
-            [(ngModel)]="creds.password" placeholder="Password">
+<div class="card bg-base-100 w-1/2 mx-auto flex flex-col p-6 rounded-lg shadow-lg">
+    <div class="card-title justify-center text-3xl text-primary">Sign up</div>
+    <div class="card-body w-full">
+        <form [formGroup]="registerForm" class="flex flex-col gap-4 w-full" (ngSubmit)="register()">
+            <app-text-input label="Email" formControlName="email" />
+            <app-text-input label="Display name" formControlName="displayName" />
+            <app-text-input label="Password" formControlName="password" type="password" />
+            <app-text-input label="Confirm Password" formControlName="confirmPassword" type="password" />
 
             <div class="flex items-center justify-end gap-3">
                 <button (click)="cancel()" type="button" class="btn">Cancel</button>
-                <button class="btn btn-primary" type="submit">Register</button>
+                <button 
+                    [disabled]="!registerForm.valid"
+                    class="btn btn-primary" type="submit">Register</button>
             </div>
         </form>
+    </div>
+
+    <div class="flex flex-col items-start px-3 w-full mockup-code text-lg">
+        <div>Form value: {{registerForm.value | json}}</div>
+        <div>Form status: {{registerForm.status | json}}</div>
+
     </div>
 
 </div>

@@ -60,7 +60,7 @@ export class MembershipComponent implements OnInit {
   ];
 
   bmi: number | null = null;
-  bmiError: string = 'Please enter your height and weight.';
+  bmiError: string = '';
 
   ngOnInit(): void {
     const index = Math.floor(Math.random() * this.quotes.length);
