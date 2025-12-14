@@ -1,33 +1,45 @@
-import { Component, inject, output } from '@angular/core';
+import { Component, inject, output, signal } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { RegisterCreds } from '../../../types/user';
 import { AccoutService } from '../../../core/services/accout-service';
-import { JsonPipe } from '@angular/common';
 import { TextInput } from "../../../shared/text-input/text-input";
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-register',
-  imports: [ReactiveFormsModule, JsonPipe, TextInput],
+  imports: [ReactiveFormsModule, TextInput],
   templateUrl: './register.html',
   styleUrl: './register.css',
 })
 export class Register {
   private accoutService = inject(AccoutService);
+  private router = inject(Router);
   private fb = inject(FormBuilder);
   cancelRegister = output<boolean>();
   protected creds = {} as RegisterCreds;
-  protected registerForm: FormGroup;
+  protected credentialsForm: FormGroup;
+  protected profileForm: FormGroup;
+  protected currentStep = signal(1);
+  protected validationErrors = signal<string[]>([]);
 
   constructor() {
-    this.registerForm = this.fb.group({
+    this.credentialsForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       displayName: ['', [Validators.required]],
       password: ['', [Validators.required,
       Validators.minLength(4), Validators.maxLength(8)]],
       confirmPassword: ['', [Validators.required, this.matchValues('password')]]
     });
-    this.registerForm.controls['password'].valueChanges.subscribe(() => {
-      this.registerForm.controls['confirmPassword'].updateValueAndValidity();
+
+    this.profileForm = this.fb.group({
+      gender: ['male', Validators.required],
+      dateOfBirth: ['', Validators.required],
+      city: ['', Validators.required],
+      country: ['', Validators.required],
+    })
+
+    this.credentialsForm.controls['password'].valueChanges.subscribe(() => {
+      this.credentialsForm.controls['confirmPassword'].updateValueAndValidity();
     })
   }
 
@@ -41,15 +53,30 @@ export class Register {
     }
   }
 
+  nextStep() {
+    if (this.credentialsForm.valid) {
+      this.currentStep.update(prevStep => prevStep + 1);
+    }
+  }
+
+  prevStep() {
+    this.currentStep.update(prevStep => prevStep - 1);
+  }
+
   register() {
-    console.log(this.registerForm.value);
-    /*  this.accoutService.register(this.creds).subscribe({
-        next: response => {
-          console.log(response);
-          this.cancel();
+    if (this.profileForm.valid && this.credentialsForm.valid) {
+      const formDate = { ...this.credentialsForm.value, ...this.profileForm.value };
+
+      this.accoutService.register(formDate).subscribe({
+        next: () => {
+          this.router.navigateByUrl('/membership');
         },
-        error: error => console.log(error)
-      }) */
+        error: error => {
+          console.log(error);
+          this.validationErrors.set(error);
+        }
+      })
+    }
   }
 
   cancel() {

@@ -16,20 +16,28 @@ public class AccountController(AppDbContext context, ITokenService tokenService)
 {
     [HttpPost("register")] //api/members/registery
     [AllowAnonymous]
-    public async Task<ActionResult<UserDto>> Register(RegisterDto dto)
+    public async Task<ActionResult<UserDto>> Register(RegisterDto registerdto)
     {
         // unique email
-        var exists = await context.Users.AnyAsync(x => x.Email == dto.Email);
+        var exists = await context.Users.AnyAsync(x => x.Email == registerdto.Email);
         if (exists) return Conflict("Email is already taken.");
 
         // hash password
         using var hmac = new HMACSHA512();
         var user = new AppUser
         {
-            DisplayName = dto.DisplayName,
-            Email = dto.Email,
+            DisplayName = registerdto.DisplayName,
+            Email = registerdto.Email,
             PasswordSalt = hmac.Key,
-            PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(dto.Password))
+            PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerdto.Password)),
+            Member = new Member
+            {
+                DisplayName = registerdto.DisplayName,
+                Gender = registerdto.Gender,
+                City = registerdto.City,
+                Country = registerdto.Country,
+                DateOfBirth = registerdto.DateOfBirth
+            }
         };
 
         context.Users.Add(user);
