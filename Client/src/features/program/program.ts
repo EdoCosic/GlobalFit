@@ -1,97 +1,100 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
+import { ToastService } from '../../core/services/toast-service';
 
 type Slot = { label: string; value: string };
 
 @Component({
   selector: 'app-program',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, HttpClientModule, FormsModule],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  templateUrl: './program.html',
+  templateUrl: './program.html'
 })
 export class Program {
+
+  private apiBase = 'https://localhost:5001/api/TrainingReservations';
+
   @ViewChild('trainerSwiper', { static: false })
   trainerSwiper!: ElementRef<any>;
 
-  // od sutra pa nadalje
   tomorrow = new Date(new Date().setDate(new Date().getDate() + 1))
     .toISOString()
     .split('T')[0];
 
-  // =============== SLOTS (08:00 do 18:00) ===============
-  allSlots: Slot[] = this.buildHourlySlots(8, 18); // 08-09 ... 18-19
+  trainers: string[] = ['Ana Ivanović', 'Petar Sučić', 'Ema Marić'];
 
-  private buildHourlySlots(fromHour: number, toHour: number): Slot[] {
-    const slots: Slot[] = [];
-    for (let h = fromHour; h <= toHour; h++) {
-      const start = `${String(h).padStart(2, '0')}:00`;
-      const end = `${String(h + 1).padStart(2, '0')}:00`;
-      slots.push({ value: start, label: `${start} – ${end}` });
-    }
-    return slots;
-  }
+  allSlots: Slot[] = this.buildHourlySlots(8, 18);
+  availableSlots: Slot[] = [...this.allSlots];
 
-  // =============== STATE (modal) ===============
   selectedTrainer = '';
   selectedDate = '';
   selectedTime = '';
-
-  availableSlots: Slot[] = [...this.allSlots];
 
   trainerError = '';
   dateError = '';
   timeError = '';
 
-  // =============== "FAKE BAZA" REZERVACIJA ===============
-  // reserved[trainerName][date] = ['14:00','16:00', ...]
-  reservedByTrainerAndDate: Record<string, Record<string, string[]>> = {
-    'Ana Ivanović': {
-      '2025-12-21': ['10:00', '16:00'],
-    },
-    'Petar Sučić': {
-      '2025-12-23': ['08:00', '18:00'],
-    },
-    'Ema Marić': {
-      // prazno za sada
-    },
-  };
+  constructor(
+    private http: HttpClient,
+    private toast: ToastService
+  ) {}
 
-  // =============== UI helpers ===============
-  scrollTo(sectionId: string) {
+  scrollTo(sectionId: string): void {
     const el = document.getElementById(sectionId);
     if (!el) return;
     el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  nextTrainer() {
+  nextTrainer(): void {
     this.trainerSwiper?.nativeElement?.swiper?.slideNext();
   }
 
-  prevTrainer() {
+  prevTrainer(): void {
     this.trainerSwiper?.nativeElement?.swiper?.slidePrev();
   }
 
-  // =============== MODAL LOGIC ===============
-  onTrainerChange(value: string) {
+  onModalChange(isOpen: boolean): void {
+    if (!isOpen) this.resetModal();
+  }
+
+  resetModal(): void {
+    this.selectedTrainer = '';
+    this.selectedDate = '';
+    this.selectedTime = '';
+
+    this.availableSlots = [...this.allSlots];
+
+    this.trainerError = '';
+    this.dateError = '';
+    this.timeError = '';
+
+    const dateEl = document.getElementById('dateInputReal') as HTMLInputElement | null;
+    if (dateEl) dateEl.value = '';
+  }
+
+  onTrainerChange(value: string): void {
     this.selectedTrainer = value;
 
     this.trainerError = '';
     this.dateError = '';
     this.timeError = '';
 
-    // resetuj izbor datuma/vremena kad promijeni trenera
     this.selectedDate = '';
     this.selectedTime = '';
     this.availableSlots = [...this.allSlots];
+
+    const dateEl = document.getElementById('dateInputReal') as HTMLInputElement | null;
+    if (dateEl) dateEl.value = '';
   }
 
-  onDateChange(value: string, inputEl: HTMLInputElement) {
+  onDateChange(value: string, inputEl: HTMLInputElement): void {
+    this.trainerError = '';
     this.dateError = '';
     this.timeError = '';
-    this.trainerError = '';
 
-    // trainer mora biti prvo
     if (!this.selectedTrainer) {
       this.trainerError = 'Please select a trainer first.';
       inputEl.value = '';
@@ -105,9 +108,11 @@ export class Program {
     this.selectedTime = '';
     this.availableSlots = [];
 
-    if (!value) return;
+    if (!value) {
+      this.availableSlots = [...this.allSlots];
+      return;
+    }
 
-    // Sunday = 0
     const day = new Date(value + 'T00:00:00').getDay();
     if (day === 0) {
       this.dateError = 'Sundays are not available. Please choose another day.';
@@ -117,27 +122,34 @@ export class Program {
       return;
     }
 
-    // filter slotova po treneru+datumu
-    const reservedForThis = new Set(
-      this.reservedByTrainerAndDate?.[this.selectedTrainer]?.[value] ?? []
-    );
+    const url = this.getReservedUrl(this.selectedTrainer, value);
 
-    this.availableSlots = this.allSlots.filter(s => !reservedForThis.has(s.value));
+    this.http.get<string[]>(url).subscribe({
+      next: (reservedTimes) => {
+        const reservedSet = new Set((reservedTimes ?? []).map((t) => (t ?? '').slice(0, 5)));
+        this.availableSlots = this.allSlots.filter((s) => !reservedSet.has(s.value));
 
-    if (this.availableSlots.length === 0) {
-      this.dateError = 'No time slots available for this date. Please choose another date.';
-      inputEl.value = '';
-      this.selectedDate = '';
-      this.availableSlots = [...this.allSlots];
-    }
+        if (this.availableSlots.length === 0) {
+          this.dateError = 'No time slots available for this date. Please choose another date.';
+          inputEl.value = '';
+          this.selectedDate = '';
+          this.availableSlots = [...this.allSlots];
+        }
+      },
+      error: (err) => {
+        console.error(err);
+        this.dateError = 'Failed to load reserved slots (API).';
+        this.availableSlots = [...this.allSlots];
+      }
+    });
   }
 
-  onTimeChange(value: string) {
+  onTimeChange(value: string): void {
     this.selectedTime = value;
     this.timeError = '';
   }
 
-  confirmReservation() {
+  confirmReservation(): void {
     this.trainerError = '';
     this.dateError = '';
     this.timeError = '';
@@ -157,52 +169,71 @@ export class Program {
       return;
     }
 
-    // upiši rezervaciju u "fake bazu"
-    if (!this.reservedByTrainerAndDate[this.selectedTrainer]) {
-      this.reservedByTrainerAndDate[this.selectedTrainer] = {};
-    }
-    if (!this.reservedByTrainerAndDate[this.selectedTrainer][this.selectedDate]) {
-      this.reservedByTrainerAndDate[this.selectedTrainer][this.selectedDate] = [];
-    }
+    this.http.post(`${this.apiBase}`, {
+      trainerName: this.selectedTrainer,
+      date: this.selectedDate,
+      startTime: this.selectedTime
+    }).subscribe({
+      next: () => {
+        this.refreshAvailableSlotsFromApi();
 
-    const list = this.reservedByTrainerAndDate[this.selectedTrainer][this.selectedDate];
+        this.toast.success('Reserved successfully', 3500);
 
-    // safety: ako je već rezervisano (ne bi trebalo da se desi)
-    if (list.includes(this.selectedTime)) {
-      this.timeError = 'This time slot has just been booked. Please choose another.';
-      // osvježi slotove
-      this.refreshAvailableSlots();
-      return;
-    }
+        const modalToggle = document.getElementById('reserve-modal') as HTMLInputElement | null;
+        if (modalToggle) modalToggle.checked = false;
 
-    list.push(this.selectedTime);
+        this.resetModal();
+      },
+      error: (err) => {
+        if (err?.status === 409) {
+          this.timeError = 'This time slot is already reserved. Please choose another.';
+          this.refreshAvailableSlotsFromApi();
+          this.toast.warning(this.timeError, 4000);
+          return;
+        }
 
-    // nakon rezervacije, ukloni slot iz dostupnih (odmah se vidi u UI)
-    this.refreshAvailableSlots();
-
-    // zatvori modal
-    const modalToggle = document.getElementById('reserve-modal') as HTMLInputElement | null;
-    if (modalToggle) modalToggle.checked = false;
-
-    // demo feedback
-    alert(
-      `Reserved (demo): ${this.selectedTrainer} on ${this.selectedDate} at ${this.selectedTime}`
-    );
-
-    // reset time (opcionalno)
-    this.selectedTime = '';
+        this.timeError = 'Reservation failed. Please try again.';
+        this.toast.error(this.timeError, 4000);
+      }
+    });
   }
 
-  private refreshAvailableSlots() {
+  private refreshAvailableSlotsFromApi(): void {
     if (!this.selectedTrainer || !this.selectedDate) {
       this.availableSlots = [...this.allSlots];
       return;
     }
 
-    const reservedForThis = new Set(
-      this.reservedByTrainerAndDate?.[this.selectedTrainer]?.[this.selectedDate] ?? []
-    );
+    const url = this.getReservedUrl(this.selectedTrainer, this.selectedDate);
 
-    this.availableSlots = this.allSlots.filter(s => !reservedForThis.has(s.value));
+    this.http.get<string[]>(url).subscribe({
+      next: (reservedTimes) => {
+        const reservedSet = new Set((reservedTimes ?? []).map((t) => (t ?? '').slice(0, 5)));
+        this.availableSlots = this.allSlots.filter((s) => !reservedSet.has(s.value));
+      },
+      error: () => {
+        this.availableSlots = [...this.allSlots];
+      }
+    });
+  }
+
+  private getReservedUrl(trainerName: string, date: string): string {
+    return (
+      `${this.apiBase}/reserved?trainerName=` +
+      encodeURIComponent(trainerName) +
+      `&date=${encodeURIComponent(date)}`
+    );
+  }
+
+  private buildHourlySlots(fromHour: number, toHour: number): Slot[] {
+    const slots: Slot[] = [];
+
+    for (let h = fromHour; h <= toHour; h++) {
+      const start = `${String(h).padStart(2, '0')}:00`;
+      const end = `${String(h + 1).padStart(2, '0')}:00`;
+      slots.push({ value: start, label: `${start} – ${end}` });
+    }
+
+    return slots;
   }
 }
