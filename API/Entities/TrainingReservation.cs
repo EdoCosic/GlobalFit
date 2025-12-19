@@ -6,17 +6,19 @@ public class TrainingReservation
 {
     public int Id { get; set; }
 
-    [Required]
-    public string TrainerName { get; set; } = null!; // za sada string, poslije može TrainerId
+    public string AppUserId { get; set; } = null!; //ovo je za rezervaciju da se zna koji user je napravio rezervaciju
 
     [Required]
-    public DateOnly Date { get; set; } // samo datum
+    public string TrainerName { get; set; } = null!;
 
     [Required]
-    public TimeOnly StartTime { get; set; } // 08:00, 09:00 ...
+    public DateOnly Date { get; set; }
 
     [Required]
-    public TimeOnly EndTime { get; set; } // Start + 60 min
+    public TimeOnly StartTime { get; set; }
+
+    [Required]
+    public TimeOnly EndTime { get; set; } 
 
     public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
 }

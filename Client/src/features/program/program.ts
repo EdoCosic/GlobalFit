@@ -1,6 +1,6 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient} from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../core/services/toast-service';
 
@@ -9,7 +9,7 @@ type Slot = { label: string; value: string };
 @Component({
   selector: 'app-program',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, FormsModule],
+  imports: [CommonModule, FormsModule],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './program.html'
 })
@@ -144,8 +144,7 @@ export class Program {
     });
   }
 
-  onTimeChange(value: string): void {
-    this.selectedTime = value;
+  onTimeChange(): void {
     this.timeError = '';
   }
 

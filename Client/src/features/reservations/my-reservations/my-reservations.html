@@ -1,0 +1,73 @@
+<div class="pt-28 pb-16 px-6">
+  <div class="max-w-5xl mx-auto">
+
+    <div class="flex items-center justify-between gap-4">
+      <div>
+        <h1 class="text-3xl font-extrabold tracking-wide">My Reservations</h1>
+        <p class="opacity-70 mt-1">View or cancel your upcoming training sessions.</p>
+      </div>
+
+      <button class="btn btn-primary" (click)="goToProgram()">
+        Reserve training
+      </button>
+    </div>
+
+    @if(loading()){
+      <div class="mt-10 flex justify-center">
+        <span class="loading loading-spinner loading-lg"></span>
+      </div>
+    } @else {
+
+      @if(reservations().length === 0){
+        <div class="mt-10 card bg-base-100 shadow-xl">
+          <div class="card-body items-center text-center">
+            <h2 class="card-title text-2xl">No reservations at the moment</h2>
+            <p class="opacity-70 max-w-xl">
+              When you reserve a training session, it will appear here with the option to cancel.
+            </p>
+            <div class="mt-4">
+              <button class="btn btn-primary" (click)="goToProgram()">
+                Reserve training
+              </button>
+            </div>
+          </div>
+        </div>
+      } @else {
+        <div class="mt-8 grid gap-6">
+
+          @for(r of reservations(); track r.id){
+            <div class="card bg-base-100 shadow-xl">
+              <div class="card-body">
+                <div class="flex flex-wrap items-center justify-between gap-4">
+
+                  <div>
+                    <h3 class="text-xl font-extrabold tracking-wide">{{r.trainerName}}</h3>
+
+                    <div class="mt-2 flex flex-wrap gap-3 text-sm opacity-80">
+                      <span class="badge badge-outline">Date: {{r.date}}</span>
+                      <span class="badge badge-outline">Time: {{r.startTime}} - {{r.endTime}}</span>
+                    </div>
+                  </div>
+
+                  <button class="btn btn-error"
+                    [disabled]="cancellingId() === r.id"
+                    (click)="cancel(r.id)">
+                    @if(cancellingId() === r.id){
+                      <span class="loading loading-spinner"></span>
+                      Cancelling...
+                    } @else {
+                      Cancel
+                    }
+                  </button>
+
+                </div>
+              </div>
+            </div>
+          }
+
+        </div>
+      }
+
+    }
+  </div>
+</div>

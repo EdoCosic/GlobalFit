@@ -3,6 +3,7 @@ import { appConfig } from './app/app.config';
 import { App } from './app/app';
 import { register } from 'swiper/element/bundle';
 
+
 register();
 
 bootstrapApplication(App, appConfig)

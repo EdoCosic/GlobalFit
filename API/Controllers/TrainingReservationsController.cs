@@ -1,13 +1,16 @@
 using API.Data;
 using API.DTOs;
 using API.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace API.Controllers
 {
     public class TrainingReservationsController(AppDbContext context) : BaseApiController
     {
+        
         [HttpGet("reserved")]
         public async Task<ActionResult<IReadOnlyList<string>>> GetReservedSlots([FromQuery] string trainerName, [FromQuery] string date)
         {
@@ -25,9 +28,60 @@ namespace API.Controllers
             return Ok(reserved);
         }
 
+        [Authorize]
+        [HttpGet("my")]
+        public async Task<ActionResult<IReadOnlyList<object>>> GetMyReservations()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(userId))
+                return Unauthorized();
+
+            var items = await context.TrainingReservations
+                .Where(x => x.AppUserId == userId)
+                .OrderBy(x => x.Date)
+                .ThenBy(x => x.StartTime)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.TrainerName,
+                    Date = x.Date.ToString("yyyy-MM-dd"),
+                    StartTime = x.StartTime.ToString("HH:mm"),
+                    EndTime = x.EndTime.ToString("HH:mm"),
+                    x.CreatedAtUtc
+                })
+                .ToListAsync();
+
+            return Ok(items);
+        }
+
+        [Authorize]
+        [HttpDelete("{id:int}")]
+        public async Task<ActionResult> Cancel(int id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(userId))
+                return Unauthorized();
+
+            var reservation = await context.TrainingReservations
+                .FirstOrDefaultAsync(x => x.Id == id && x.AppUserId == userId);
+
+            if (reservation == null)
+                return NotFound("Reservation not found.");
+
+            context.TrainingReservations.Remove(reservation);
+            await context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult> Create([FromBody] TrainingReservationCreateDto dto)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(userId))
+                return Unauthorized();
+
             if (!DateOnly.TryParse(dto.Date, out var d))
                 return BadRequest("Invalid date format. Use yyyy-MM-dd.");
 
@@ -60,7 +114,8 @@ namespace API.Controllers
                 TrainerName = dto.TrainerName,
                 Date = d,
                 StartTime = start,
-                EndTime = start.AddMinutes(60)
+                EndTime = start.AddMinutes(60),
+                AppUserId = userId
             };
 
             context.TrainingReservations.Add(reservation);

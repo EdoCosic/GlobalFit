@@ -11,14 +11,15 @@
       </p>
     </div>
 
-    <div class="mt-10 grid gap-10 md:grid-cols-2 md:items-center">
-      <div class="overflow-hidden rounded-2xl">
-        <img
-          src="/hero.jpg"
-          alt="Program hero"
-          class="h-80 w-full object-cover md:h-96"
-        />
+    <div class="mt-16 grid gap-10 md:grid-cols-2 md:items-center">
+      <div class="relative">
+        <div class="absolute -top-6 -left-6 h-full w-full rounded-3xl bg-primary/20"></div>
+
+        <div class="relative overflow-hidden rounded-3xl shadow-2xl">
+          <img src="/hero.jpg" alt="Program hero" class="h-[420px] w-full object-cover md:h-[520px]" />
+        </div>
       </div>
+
 
       <div>
         <h2 class="text-3xl font-extrabold tracking-wide md:text-4xl">
@@ -53,19 +54,10 @@
 
       <div class="text-center">
         <div class="mx-auto mb-4 flex h-10 w-10 items-center justify-center text-primary">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="size-8"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z"
-            />
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+            stroke="currentColor" class="size-8">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" />
           </svg>
         </div>
 
@@ -80,19 +72,10 @@
 
       <div class="text-center">
         <div class="mx-auto mb-4 flex h-10 w-10 items-center justify-center text-primary">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="size-8"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z"
-            />
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+            stroke="currentColor" class="size-8">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
           </svg>
         </div>
 
@@ -107,19 +90,9 @@
 
       <div class="text-center">
         <div class="mx-auto mb-4 flex h-10 w-10 items-center justify-center text-primary">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="size-8"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-            />
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+            stroke="currentColor" class="size-8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
           </svg>
         </div>
 
@@ -138,46 +111,30 @@
   <section id="trainers" class="mx-auto max-w-6xl px-4 pt-12 pb-6">
     <div class="text-center">
       <h2 class="text-4xl font-extrabold tracking-wide">
-        <span class="text-primary">CHOOSE</span> A <span>TRAINER</span>
+        <span class="text-primary">ONLY</span> THE <span>BEST</span>
       </h2>
     </div>
 
     <div class="relative mt-10">
-      <button
-        type="button"
+      <button type="button"
         class="btn btn-ghost btn-circle absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 z-10"
-        (click)="prevTrainer()"
-        aria-label="Previous trainer"
-      >
+        (click)="prevTrainer()" aria-label="Previous trainer">
         ❮
       </button>
 
-      <button
-        type="button"
+      <button type="button"
         class="btn btn-ghost btn-circle absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2 z-10"
-        (click)="nextTrainer()"
-        aria-label="Next trainer"
-      >
+        (click)="nextTrainer()" aria-label="Next trainer">
         ❯
       </button>
 
-      <swiper-container
-        #trainerSwiper
-        slides-per-view="1"
-        space-between="16"
-        centered-slides="true"
-        speed="450"
-      >
+      <swiper-container #trainerSwiper slides-per-view="1" space-between="16" centered-slides="true" speed="450">
 
         <swiper-slide>
           <div class="overflow-hidden rounded-2xl border border-base-300">
             <div class="grid md:grid-cols-2">
               <div class="h-64 md:h-full">
-                <img
-                  src="/trainer-1.jpg"
-                  alt="Ana Ivanović"
-                  class="h-full w-full object-cover"
-                />
+                <img src="/trainer-1.jpg" alt="Ana Ivanović" class="h-full w-full object-cover" />
               </div>
 
               <div class="flex h-full flex-col p-6 md:p-8">
@@ -194,12 +151,14 @@
                 </p>
 
                 <p class="mt-5 text-lg font-semibold leading-relaxed opacity-90 md:text-xl">
-                  “Consistency beats motivation — we build a plan you can actually follow.”
+                  “Consistency beats motivation - we build a plan you can actually follow.”
                 </p>
 
                 <p class="mt-4 text-base leading-relaxed opacity-80 md:text-lg">
-                  I focus on progressive overload, clean technique, and building strength in a way that feels
-                  sustainable...
+                  I focus on progressive overload, clean technique, and structured strength
+                  training to help clients build muscle and confidence over time. My coaching
+                  is built around consistency and realistic plans that fit your lifestyle,
+                  allowing you to make steady progress without unnecessary complexity.
                 </p>
               </div>
             </div>
@@ -210,11 +169,7 @@
           <div class="overflow-hidden rounded-2xl border border-base-300">
             <div class="grid md:grid-cols-2">
               <div class="h-64 md:h-full">
-                <img
-                  src="/trainer-2.jpg"
-                  alt="Petar Sučić"
-                  class="h-full w-full object-cover"
-                />
+                <img src="/trainer-2.jpg" alt="Petar Sučić" class="h-full w-full object-cover" />
               </div>
 
               <div class="flex h-full flex-col p-6 md:p-8">
@@ -231,11 +186,14 @@
                 </p>
 
                 <p class="mt-5 text-lg font-semibold leading-relaxed opacity-90 md:text-xl">
-                  “You don’t need extreme diets — you need a system you can repeat.”
+                  “You don’t need extreme diets - you need a system you can repeat.”
                 </p>
 
                 <p class="mt-4 text-base leading-relaxed opacity-80 md:text-lg">
-                  My approach is built around habits...
+                  My approach is built around sustainable habits, structured training, and
+                  realistic nutrition strategies that fit into everyday life. I help clients
+                  lose fat, improve conditioning, and build consistency without extreme diets
+                  or burnout - focusing on systems you can repeat long term.
                 </p>
               </div>
             </div>
@@ -246,11 +204,7 @@
           <div class="overflow-hidden rounded-2xl border border-base-300">
             <div class="grid md:grid-cols-2">
               <div class="h-64 md:h-full">
-                <img
-                  src="/trainer-3.jpg"
-                  alt="Ema Marić"
-                  class="h-full w-full object-cover"
-                />
+                <img src="/trainer-3.jpg" alt="Ema Marić" class="h-full w-full object-cover" />
               </div>
 
               <div class="flex h-full flex-col p-6 md:p-8">
@@ -267,11 +221,14 @@
                 </p>
 
                 <p class="mt-5 text-lg font-semibold leading-relaxed opacity-90 md:text-xl">
-                  “Move better first — strength and performance come naturally after that.”
+                  “Move better first - strength and performance come naturally after that.”
                 </p>
 
                 <p class="mt-4 text-base leading-relaxed opacity-80 md:text-lg">
-                  I specialize in movement quality...
+                  I help clients build strong, pain-free bodies by focusing on proper movement patterns, mobility, and
+                  long-term sustainability.
+                  My approach prioritizes quality over quantity, ensuring that every session improves how you move,
+                  feel, and perform - both in and out of the gym.
                 </p>
               </div>
             </div>
@@ -301,26 +258,23 @@
           We’ll confirm your reservation and get you started.
         </p>
 
-        <div class="mt-6 flex flex-wrap gap-3 md:justify-end">
-          <label
-            for="reserve-modal"
-            class="btn btn-primary cursor-pointer"
-            (click)="resetModal()"
-          >
-            Reserve Training
-          </label>
+        <div class="mt-12 flex justify-center md:justify-end">
+          <div class="relative">
+            <span class="absolute -inset-2 rounded-xl bg-primary/30 blur animate-pulse"></span>
+
+            <label for="reserve-modal" (click)="resetModal()"
+              class="relative btn btn-primary btn-lg px-10 text-lg font-bold">
+              Reserve Training
+            </label>
+          </div>
         </div>
+
       </div>
     </div>
   </section>
 
-  <input
-    #reserveModal
-    type="checkbox"
-    id="reserve-modal"
-    class="modal-toggle"
-    (change)="onModalChange(reserveModal.checked)"
-  />
+  <input #reserveModal type="checkbox" id="reserve-modal" class="modal-toggle"
+    (change)="onModalChange(reserveModal.checked)" />
 
   <div class="modal modal-bottom sm:modal-middle">
     <div class="modal-box">
@@ -339,11 +293,8 @@
             <span class="label-text font-semibold">Trainer</span>
           </label>
 
-          <select
-            class="select select-bordered w-full"
-            [(ngModel)]="selectedTrainer"
-            (ngModelChange)="onTrainerChange($event)"
-          >
+          <select class="select select-bordered w-full" [(ngModel)]="selectedTrainer"
+            (ngModelChange)="onTrainerChange($event)">
             <option value="" disabled>Select trainer</option>
             <option *ngFor="let t of trainers" [ngValue]="t">{{ t }}</option>
           </select>
@@ -358,16 +309,9 @@
             <span class="label-text font-semibold">Date</span>
           </label>
 
-          <input
-            #dateInput
-            id="dateInputReal"
-            type="date"
-            class="input input-bordered w-full"
-            [min]="tomorrow"
-            [(ngModel)]="selectedDate"
-            (input)="onDateChange(selectedDate, dateInput)"
-            (change)="onDateChange(selectedDate, dateInput)"
-          />
+          <input #dateInput id="dateInputReal" type="date" class="input input-bordered w-full" [min]="tomorrow"
+            [(ngModel)]="selectedDate" (input)="onDateChange(selectedDate, dateInput)"
+            (change)="onDateChange(selectedDate, dateInput)" />
 
           <p *ngIf="dateError" class="mt-2 text-sm text-error font-semibold">
             {{ dateError }}
@@ -379,17 +323,16 @@
             <span class="label-text font-semibold">Time</span>
           </label>
 
-          <select
-            class="select select-bordered w-full"
-            [disabled]="!selectedTrainer || !selectedDate || availableSlots.length === 0"
-            [(ngModel)]="selectedTime"
-            (ngModelChange)="onTimeChange($event)"
-          >
+          <select class="select select-bordered w-full"
+            [disabled]="!selectedTrainer || !selectedDate || availableSlots.length === 0" [(ngModel)]="selectedTime"
+            (ngModelChange)="onTimeChange()">
             <option value="" disabled>Select time</option>
-            <option *ngFor="let s of availableSlots" [ngValue]="s.value">
+
+            <option *ngFor="let s of availableSlots" [value]="s.value">
               {{ s.label }}
             </option>
           </select>
+
 
           <p *ngIf="timeError" class="mt-2 text-sm text-error font-semibold">
             {{ timeError }}
@@ -397,11 +340,7 @@
         </div>
 
         <div class="modal-action mt-6">
-          <label
-            for="reserve-modal"
-            class="btn btn-ghost"
-            (click)="resetModal()"
-          >
+          <label for="reserve-modal" class="btn btn-ghost" (click)="resetModal()">
             Cancel
           </label>
 
@@ -413,5 +352,5 @@
       </div>
     </div>
   </div>
-  
+
 </div>

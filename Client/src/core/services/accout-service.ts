@@ -43,4 +43,15 @@ export class AccoutService {
     localStorage.removeItem('user');
     this.currentUser.set(null);
   }
+
+  loadCurrentUser() {
+    const userString = localStorage.getItem('user');
+    if (!userString) {
+     this.currentUser.set(null);
+    return;
+  }
+
+    const user: User = JSON.parse(userString);
+    this.currentUser.set(user);
+  }
 }

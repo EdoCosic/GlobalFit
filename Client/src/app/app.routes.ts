@@ -12,6 +12,8 @@ import { authGuard } from '../core/guards/auth-guard';
 import { TestErrors } from '../features/test-errors/test-errors';
 import { NotFound } from '../shared/errors/not-found/not-found';
 import { ServerError } from '../shared/errors/server-error/server-error';
+import { MyReservations } from '../features/reservations/my-reservations/my-reservations';
+
 
 export const routes: Routes = [
     { path: '', component: Home },
@@ -26,6 +28,7 @@ export const routes: Routes = [
 
             { path: 'news', component: Messages },
             { path: 'reviews', component: Reviews },
+            { path: 'my-reservations', component: MyReservations },
         ]
     },
 
