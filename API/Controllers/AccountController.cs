@@ -6,30 +6,24 @@ using API.Extensions;
 using API.Models;
 using API.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers;
 
 
-public class AccountController(AppDbContext context, ITokenService tokenService) : BaseApiController
+public class AccountController(UserManager<AppUser> userManager, ITokenService tokenService) : BaseApiController
 {
     [HttpPost("register")] //api/members/registery
     [AllowAnonymous]
     public async Task<ActionResult<UserDto>> Register(RegisterDto registerdto)
     {
-        // unique email
-        var exists = await context.Users.AnyAsync(x => x.Email == registerdto.Email);
-        if (exists) return Conflict("Email is already taken.");
-
-        // hash password
-        using var hmac = new HMACSHA512();
         var user = new AppUser
         {
             DisplayName = registerdto.DisplayName,
             Email = registerdto.Email,
-            PasswordSalt = hmac.Key,
-            PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerdto.Password)),
+            UserName = registerdto.Email,
             Member = new Member
             {
                 DisplayName = registerdto.DisplayName,
@@ -40,24 +34,31 @@ public class AccountController(AppDbContext context, ITokenService tokenService)
             }
         };
 
-        context.Users.Add(user);
-        await context.SaveChangesAsync();
+        var result = await userManager.CreateAsync(user, registerdto.Password);
+
+        if (!result.Succeeded)
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError("identity", error.Description);
+            }
+            return ValidationProblem();
+        }
 
         return user.ToDto(tokenService);
     }
 
     [HttpPost("login")]
     [AllowAnonymous]
-    public async Task<ActionResult<UserDto>> Login(LoginDto dto)
+    public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
     {
-        var user = await context.Users.SingleOrDefaultAsync(x => x.Email == dto.Email);
+        var user = await userManager.FindByEmailAsync(loginDto.Email);
+
         if (user is null) return Unauthorized("Invalid email address.");
 
-        using var hmac = new HMACSHA512(user.PasswordSalt);
-        var computed = hmac.ComputeHash(Encoding.UTF8.GetBytes(dto.Password));
+        var result = await userManager.CheckPasswordAsync(user, loginDto.Password);
 
-        if (!computed.SequenceEqual(user.PasswordHash))
-            return Unauthorized("Invalid password.");
+        if (!result) return Unauthorized("Invalid password.");
 
         return user.ToDto(tokenService);
     }
