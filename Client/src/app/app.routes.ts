@@ -13,6 +13,8 @@ import { TestErrors } from '../features/test-errors/test-errors';
 import { NotFound } from '../shared/errors/not-found/not-found';
 import { ServerError } from '../shared/errors/server-error/server-error';
 import { MyReservations } from '../features/reservations/my-reservations/my-reservations';
+import { Admin } from '../features/admin/admin';
+import { adminGuard } from '../core/guards/admin-guard';
 
 
 export const routes: Routes = [
@@ -35,6 +37,8 @@ export const routes: Routes = [
     { path: 'members', component: MemberList }, //ne koristi se nez hocu li koristi jos uvijek ( nek stoji za sad)
     { path: 'members/:id', component: MemberDetailed }, //ne koristi se nez hocu li koristi jos uvijek ( nek stoji za sad)
     { path: 'lists', component: Lists }, //ne koristi se nez hocu li koristi jos uvijek ( nek stoji za sad)
+
+    { path: 'admin', component: Admin, canActivate: [adminGuard] },
 
     {path: 'errors', component: TestErrors },
     {path: 'server-error', component: ServerError },

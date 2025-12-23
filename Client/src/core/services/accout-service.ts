@@ -35,6 +35,7 @@ export class AccoutService {
   }
 
   setCurrentUser(user: User) {
+    user.roles = this.getRolesFromToken(user);
     localStorage.setItem('user', JSON.stringify(user))
     this.currentUser.set(user);
   }
@@ -44,6 +45,34 @@ export class AccoutService {
     this.currentUser.set(null);
   }
 
+ // private getRolesFromToken(user: User): string[] {
+ //   const payload = user.token.split('.')[1];
+ //   const decoded = atob(payload);
+ //   const jsonPayload = JSON.parse(decoded);
+ //   return Array.isArray(jsonPayload.role) ? jsonPayload.role : [jsonPayload.role]
+ // }
+
+  private getRolesFromToken(user: User): string[] {
+  const token = user?.token;
+  if (!token) return [];
+
+  const payload = token.split('.')[1];
+  if (!payload) return [];
+
+  const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+  const padded = base64.padEnd(base64.length + (4 - (base64.length % 4)) % 4, '=');
+
+  const decoded = atob(padded);
+  const jsonPayload = JSON.parse(decoded);
+
+  const roleClaim = jsonPayload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+
+  if (!roleClaim) return [];
+
+  return Array.isArray(roleClaim) ? roleClaim : [roleClaim];
+}
+
+
   loadCurrentUser() {
     const userString = localStorage.getItem('user');
     if (!userString) {
@@ -52,6 +81,10 @@ export class AccoutService {
   }
 
     const user: User = JSON.parse(userString);
+    user.roles = this.getRolesFromToken(user);
+
+    localStorage.setItem('user', JSON.stringify(user));
+
     this.currentUser.set(user);
   }
 }

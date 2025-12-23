@@ -1,7 +1,9 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 using API.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -15,11 +17,11 @@ public class JwtOptions
     public int ExpiresMinutes { get; set; } = 60;
 }
 
-public class TokenService(IOptions<JwtOptions> options) : ITokenService
+public class TokenService(IOptions<JwtOptions> options, UserManager<AppUser> userManager) : ITokenService
 {
     private readonly JwtOptions _opt = options.Value;
 
-    public string CreateToken(AppUser user)
+    public async Task<string> CreateToken(AppUser user)
     {
         var claims = new List<Claim>
         {
@@ -27,6 +29,10 @@ public class TokenService(IOptions<JwtOptions> options) : ITokenService
             new(ClaimTypes.Name, user.DisplayName),
             new(ClaimTypes.Email, user.Email!)
         };
+
+        var roles = await userManager.GetRolesAsync(user);
+
+        claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_opt.Key));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

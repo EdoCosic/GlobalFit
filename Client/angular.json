@@ -21,6 +21,10 @@
         "@schematics/angular:interceptor": {
           "skipTests": true,
           "path": "src/core/interceptors"
+        },
+        "@schematics/angular:directive": {
+          "skipTests": true,
+          "path": "src/shared/directives"
         }
       },
       "root": "",

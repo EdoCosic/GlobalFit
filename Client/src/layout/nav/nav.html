@@ -24,6 +24,7 @@
             <a routerLink="/shop" routerLinkActive="text-accent">Shop</a>
             <a routerLink="/news" routerLinkActive="text-accent">News</a>
             <a routerLink="/reviews" routerLinkActive="text-accent">Reviews</a>
+            <a *appHasRole="['Admin','Moderator']" routerLink="/admin" routerLinkActive="text-accent">Admin</a>
             }
             <a routerLink="/errors" routerLinkActive="text-accent">Errors</a>
         </nav>

@@ -88,6 +88,10 @@ builder.Services
         };
     });
 
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"))
+    .AddPolicy("ModeratePhotoRole", policy => policy.RequireRole("Admin", "Moderator"));
+
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
