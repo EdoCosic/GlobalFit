@@ -123,5 +123,64 @@ namespace API.Controllers
 
             return Ok(new { reservation.Id });
         }
+        [Authorize]
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult> Update(int id, [FromBody] TrainingReservationUpdateDto dto)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(userId))
+                return Unauthorized();
+
+            var reservation = await context.TrainingReservations
+                .FirstOrDefaultAsync(x => x.Id == id && x.AppUserId == userId);
+
+            if (reservation == null)
+                return NotFound("Reservation not found.");
+
+            var currentStart = reservation.Date.ToDateTime(reservation.StartTime);
+            if (currentStart < DateTime.Now.AddHours(24))
+                return BadRequest("You can update only 24+ hours before the session.");
+
+            if (!DateOnly.TryParse(dto.Date, out var newDate))
+                return BadRequest("Invalid date format. Use yyyy-MM-dd.");
+
+            if (!TimeOnly.TryParse(dto.StartTime, out var newStart))
+                return BadRequest("Invalid time format. Use HH:mm.");
+
+            var newStartDateTime = newDate.ToDateTime(newStart);
+            if (newStartDateTime < DateTime.Now.AddHours(24))
+                return BadRequest("New time must be 24+ hours from now.");
+
+            var newDayOfWeek = newDate.ToDateTime(TimeOnly.MinValue).DayOfWeek;
+            if (newDayOfWeek == DayOfWeek.Sunday)
+                return BadRequest("Sundays are not available.");
+
+            var allowed = new HashSet<string>(
+                Enumerable.Range(8, 11).Select(h => new TimeOnly(h, 0).ToString("HH:mm"))
+            );
+
+            if (!allowed.Contains(newStart.ToString("HH:mm")))
+                return BadRequest("Invalid slot. Allowed 08:00–18:00.");
+
+            var newTrainer = string.IsNullOrWhiteSpace(dto.TrainerName) ? reservation.TrainerName : dto.TrainerName;
+
+            var conflict = await context.TrainingReservations.AnyAsync(x =>
+                x.Id != id &&
+                x.TrainerName == newTrainer &&
+                x.Date == newDate &&
+                x.StartTime == newStart
+            );
+
+            if (conflict)
+                return Conflict("This time slot is already reserved.");
+
+            reservation.TrainerName = newTrainer;
+            reservation.Date = newDate;
+            reservation.StartTime = newStart;
+            reservation.EndTime = newStart.AddMinutes(60);
+
+            await context.SaveChangesAsync();
+            return NoContent();
+        }
     }
 }

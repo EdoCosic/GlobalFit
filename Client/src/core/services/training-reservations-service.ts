@@ -13,4 +13,13 @@ export class TrainingReservationsService {
   cancelReservation(id: number) {
     return this.http.delete(`${this.apiBase}/${id}`);
   }
+
+  updateReservation(id: number, payload: { trainerName: string; date: string; startTime: string }) {
+    return this.http.put<void>(`${this.apiBase}/${id}`, payload);
+  }
+  getReservedSlots(trainerName: string, date: string) {
+    return this.http.get<string[]>(`${this.apiBase}/reserved`, {
+      params: { trainerName, date }
+    });
+  }
 }

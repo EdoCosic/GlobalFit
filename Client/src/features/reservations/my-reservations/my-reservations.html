@@ -6,68 +6,146 @@
         <h1 class="text-3xl font-extrabold tracking-wide">My Reservations</h1>
         <p class="opacity-70 mt-1">View or cancel your upcoming training sessions.</p>
       </div>
+      <div class="flex items-center gap-3">
+        <select class="select select-bordered w-26" [value]="sortBy()" (change)="changeSort($any($event.target).value)">
+          <option value="asc">Sort Asc</option>
+          <option value="desc">Sort Desc</option>
+        </select>
 
-      <button class="btn btn-primary" (click)="goToProgram()">
-        Reserve training
-      </button>
+        <button class="btn btn-primary" (click)="goToProgram()">
+          Reserve training
+        </button>
+      </div>
     </div>
 
     @if(loading()){
-      <div class="mt-10 flex justify-center">
-        <span class="loading loading-spinner loading-lg"></span>
-      </div>
+    <div class="mt-10 flex justify-center">
+      <span class="loading loading-spinner loading-lg"></span>
+    </div>
     } @else {
 
-      @if(reservations().length === 0){
-        <div class="mt-10 card bg-base-100 shadow-xl">
-          <div class="card-body items-center text-center">
-            <h2 class="card-title text-2xl">No reservations at the moment</h2>
-            <p class="opacity-70 max-w-xl">
-              When you reserve a training session, it will appear here with the option to cancel.
-            </p>
-            <div class="mt-4">
-              <button class="btn btn-primary" (click)="goToProgram()">
-                Reserve training
-              </button>
-            </div>
-          </div>
+    @if(reservations().length === 0){
+    <div class="mt-10 card bg-base-100 shadow-xl">
+      <div class="card-body items-center text-center">
+        <h2 class="card-title text-2xl">No reservations at the moment</h2>
+        <p class="opacity-70 max-w-xl">
+          When you reserve a training session, it will appear here with the option to cancel.
+        </p>
+        <div class="mt-4">
+          <button class="btn btn-primary" (click)="goToProgram()">
+            Reserve training
+          </button>
         </div>
-      } @else {
-        <div class="mt-8 grid gap-6">
+      </div>
+    </div>
+    } @else {
+    <div class="mt-8 grid gap-6">
 
-          @for(r of reservations(); track r.id){
-            <div class="card bg-base-100 shadow-xl">
-              <div class="card-body">
-                <div class="flex flex-wrap items-center justify-between gap-4">
+      @for(r of sortedReservations(); track r.id){
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <div class="flex flex-wrap items-center justify-between gap-4">
 
-                  <div>
-                    <h3 class="text-xl font-extrabold tracking-wide">{{r.trainerName}}</h3>
+            <div>
+              <h3 class="text-xl font-extrabold tracking-wide">{{r.trainerName}}</h3>
 
-                    <div class="mt-2 flex flex-wrap gap-3 text-sm opacity-80">
-                      <span class="badge badge-outline">Date: {{r.date}}</span>
-                      <span class="badge badge-outline">Time: {{r.startTime}} - {{r.endTime}}</span>
-                    </div>
-                  </div>
+              <div class="mt-2 flex flex-wrap gap-3 text-sm opacity-80">
+                <span class="badge badge-outline">Date: {{r.date}}</span>
+                <span class="badge badge-outline">Time: {{r.startTime}} - {{r.endTime}}</span>
 
-                  <button class="btn btn-error"
-                    [disabled]="cancellingId() === r.id"
-                    (click)="cancel(r.id)">
-                    @if(cancellingId() === r.id){
-                      <span class="loading loading-spinner"></span>
-                      Cancelling...
-                    } @else {
-                      Cancel
-                    }
-                  </button>
-
-                </div>
+                @if(!canUpdate(r)){
+                <span class="badge badge-ghost">Update locked (within 24h)</span>
+                }
               </div>
             </div>
-          }
 
+            <div class="flex gap-2">
+              <button class="btn btn-warning" [disabled]="!canUpdate(r)" (click)="openUpdate(r)">
+                Update
+              </button>
+
+              <button class="btn btn-error" [disabled]="cancellingId() === r.id" (click)="cancel(r.id)">
+                @if(cancellingId() === r.id){
+                <span class="loading loading-spinner"></span>
+                Cancelling...
+                } @else {
+                Cancel
+                }
+              </button>
+            </div>
+
+          </div>
         </div>
+      </div>
       }
+
+    </div>
+    }
 
     }
   </div>
 </div>
+
+<dialog id="update_modal" class="modal">
+  <div class="modal-box">
+    <h3 class="font-bold text-lg">Update reservation</h3>
+
+    @if(selectedReservation() !== null){
+    <p class="opacity-70 mt-1 text-sm">
+      Current: {{selectedReservation()!.trainerName}} — {{selectedReservation()!.date}} at
+      {{selectedReservation()!.startTime}}
+    </p>
+    }
+
+    <form class="mt-4 space-y-3" [formGroup]="updateForm" (ngSubmit)="saveUpdate()">
+
+      <label class="form-control w-full">
+        <span class="label-text">Trainer</span>
+        <input class="input input-bordered w-full" formControlName="trainerName" />
+        @if(updateForm.get('trainerName')?.touched && updateForm.get('trainerName')?.invalid){
+        <span class="text-error text-sm mt-1">Trainer is required.</span>
+        }
+      </label>
+
+      <label class="form-control w-full">
+        <span class="label-text">Date</span>
+        <input class="input input-bordered w-full" type="date" formControlName="date" />
+        @if(updateForm.get('date')?.touched && updateForm.get('date')?.invalid){
+        <span class="text-error text-sm mt-1">Date is required.</span>
+        }
+      </label>
+
+      <label class="form-control w-full">
+        <span class="label-text">Start time</span>
+        <select class="select select-bordered w-full" formControlName="startTime">
+          <option value="" disabled>Select time</option>
+
+          @for(t of filteredTimes(); track t){
+          <option [value]="t">{{ t }} - {{ addHour(t) }}</option>
+          }
+        </select>
+
+        @if(updateForm.get('startTime')?.touched && updateForm.get('startTime')?.invalid){
+        <span class="text-error text-sm mt-1">Start time is required.</span>
+        }
+      </label>
+
+      <div class="modal-action">
+        <button type="button" class="btn" [disabled]="updating()" (click)="closeUpdate()">Close</button>
+
+        <button type="submit" class="btn btn-warning" [disabled]="updating() || updateForm.invalid">
+          @if(updating()){
+          <span class="loading loading-spinner"></span>
+          Saving...
+          } @else {
+          Save
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <form method="dialog" class="modal-backdrop">
+    <button (click)="closeUpdate()">close</button>
+  </form>
+</dialog>
