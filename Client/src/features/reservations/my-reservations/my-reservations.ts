@@ -3,6 +3,8 @@ import { Router } from '@angular/router';
 import { ToastService } from '../../../core/services/toast-service';
 import { TrainingReservationsService } from '../../../core/services/training-reservations-service';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { LocalDatePipe } from '../../../shared/pipes/local-date.pipe';
+
 
 
 type MyReservation = {
@@ -17,7 +19,7 @@ type MyReservation = {
 @Component({
   selector: 'app-my-reservations',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, LocalDatePipe],
   templateUrl: './my-reservations.html',
   styleUrl: './my-reservations.css'
 })

@@ -50,7 +50,7 @@
               <h3 class="text-xl font-extrabold tracking-wide">{{r.trainerName}}</h3>
 
               <div class="mt-2 flex flex-wrap gap-3 text-sm opacity-80">
-                <span class="badge badge-outline">Date: {{r.date}}</span>
+                <span class="badge badge-outline">Date: {{ (r.date + 'T00:00:00') | localDate }}</span>
                 <span class="badge badge-outline">Time: {{r.startTime}} - {{r.endTime}}</span>
 
                 @if(!canUpdate(r)){
@@ -92,8 +92,9 @@
 
     @if(selectedReservation() !== null){
     <p class="opacity-70 mt-1 text-sm">
-      Current: {{selectedReservation()!.trainerName}} — {{selectedReservation()!.date}} at
-      {{selectedReservation()!.startTime}}
+      Current: {{ selectedReservation()!.trainerName }} —
+      {{ (selectedReservation()!.date + 'T00:00:00') | localDate }} at
+      {{ selectedReservation()!.startTime }}
     </p>
     }
 

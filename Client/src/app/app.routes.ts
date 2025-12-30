@@ -1,46 +1,65 @@
 import { Routes } from '@angular/router';
-import { Home } from "../features/home/home";
-import { MemberList } from '../features/members/member-list/member-list';
-import { MemberDetailed } from '../features/members/member-detailed/member-detailed';
-import { Lists } from '../features/lists/lists';
-import { Messages } from '../features/messages/messages';
-import { MembershipComponent } from '../features/membership/membership';
-import { Program } from '../features/program/program';
-import { Shop } from '../features/shop/shop';
-import { Reviews } from '../features/reviews/reviews';
 import { authGuard } from '../core/guards/auth-guard';
-import { TestErrors } from '../features/test-errors/test-errors';
+import { adminGuard } from '../core/guards/admin-guard';
 import { NotFound } from '../shared/errors/not-found/not-found';
 import { ServerError } from '../shared/errors/server-error/server-error';
-import { MyReservations } from '../features/reservations/my-reservations/my-reservations';
-import { Admin } from '../features/admin/admin';
-import { adminGuard } from '../core/guards/admin-guard';
-
 
 export const routes: Routes = [
-    { path: '', component: Home },
-    {
-        path: '',
-        runGuardsAndResolvers: 'always',
-        canActivate: [authGuard],
-        children: [
-            { path: 'membership', component: MembershipComponent},
-            { path: 'program', component: Program },
-            { path: 'shop', component: Shop },
-
-            { path: 'news', component: Messages },
-            { path: 'reviews', component: Reviews },
-            { path: 'my-reservations', component: MyReservations },
-        ]
-    },
-
-    { path: 'members', component: MemberList }, //ne koristi se nez hocu li koristi jos uvijek ( nek stoji za sad)
-    { path: 'members/:id', component: MemberDetailed }, //ne koristi se nez hocu li koristi jos uvijek ( nek stoji za sad)
-    { path: 'lists', component: Lists }, //ne koristi se nez hocu li koristi jos uvijek ( nek stoji za sad)
-
-    { path: 'admin', component: Admin, canActivate: [adminGuard] },
-
-    {path: 'errors', component: TestErrors },
-    {path: 'server-error', component: ServerError },
-    { path: '**', component: NotFound },
+  {
+    path: '',
+    loadComponent: () =>
+      import('../features/home/home').then(m => m.Home),
+  },
+  {
+    path: '',
+    runGuardsAndResolvers: 'always',
+    canActivate: [authGuard],
+    children: [
+      {
+        path: 'membership',
+        loadComponent: () =>
+          import('../features/membership/membership').then(m => m.MembershipComponent),
+      },
+      {
+        path: 'program',
+        loadComponent: () =>
+          import('../features/program/program').then(m => m.Program),
+      },
+      {
+        path: 'shop',
+        loadComponent: () =>
+          import('../features/shop/shop').then(m => m.Shop),
+      },
+      {
+        path: 'news',
+        loadComponent: () =>
+          import('../features/messages/messages').then(m => m.Messages),
+      },
+      {
+        path: 'reviews',
+        loadComponent: () =>
+          import('../features/reviews/reviews').then(m => m.Reviews),
+      },
+      {
+        path: 'my-reservations',
+        loadComponent: () =>
+          import('../features/reservations/my-reservations/my-reservations').then(
+            m => m.MyReservations
+          ),
+      },
+    ],
+  },
+  {
+    path: 'admin',
+    canActivate: [adminGuard],
+    loadComponent: () =>
+      import('../features/admin/admin').then(m => m.Admin),
+  },
+  {
+    path: 'errors',
+    loadComponent: () =>
+      import('../features/test-errors/test-errors').then(m => m.TestErrors),
+  },
+  { path: 'server-error', component: ServerError },
+  { path: '**', component: NotFound },
 ];
