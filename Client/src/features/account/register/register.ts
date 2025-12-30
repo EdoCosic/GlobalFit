@@ -4,6 +4,9 @@ import { RegisterCreds } from '../../../types/user';
 import { AccoutService } from '../../../core/services/accout-service';
 import { TextInput } from "../../../shared/text-input/text-input";
 import { Router } from '@angular/router';
+import { AsyncValidatorFn } from '@angular/forms';
+import { debounceTime, distinctUntilChanged, first, map, of, switchMap } from 'rxjs';
+
 
 @Component({
   selector: 'app-register',
@@ -24,7 +27,7 @@ export class Register {
 
   constructor() {
     this.credentialsForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
+      email: ['', [Validators.required, Validators.email], [this.emailNotTakenValidator()]],
       displayName: ['', [Validators.required]],
       password: ['', [Validators.required,
       Validators.minLength(4), Validators.maxLength(8)]],
@@ -52,6 +55,25 @@ export class Register {
       return control.value === matchValue ? null : { passwordMismatch: true }
     }
   }
+
+  emailNotTakenValidator(): AsyncValidatorFn {
+  return (control: AbstractControl) => {
+    const email = control.value?.trim();
+
+    if (!email) return of(null);
+
+    return of(email).pipe(
+      debounceTime(400),
+      distinctUntilChanged(),
+      switchMap(value =>
+        this.accoutService.emailExists(value).pipe(
+          map(exists => (exists ? { emailTaken: true } : null)),
+          first()
+        )
+      )
+    );
+  };
+}
 
   nextStep() {
     if (this.credentialsForm.valid) {

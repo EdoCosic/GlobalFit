@@ -57,13 +57,13 @@
 
 
     @if (validationErrors().length > 0) {
-        <div class="mt-5 bg-gray-200 rounded-2xl w-1/2 p-3 mx-auto">
-            <ul class="flex flex-col text-error space-y-1">
-                @for (error of validationErrors(); track $index) {
-                    <li>{{error}}</li>
-                }
-            </ul>
-        </div>
+    <div class="mt-5 bg-gray-200 rounded-2xl w-1/2 p-3 mx-auto">
+        <ul class="flex flex-col text-error space-y-1">
+            @for (error of validationErrors(); track $index) {
+            <li>{{error}}</li>
+            }
+        </ul>
+    </div>
     }
 
 </div>

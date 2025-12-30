@@ -10,7 +10,7 @@ namespace API.Controllers
 {
     public class TrainingReservationsController(AppDbContext context) : BaseApiController
     {
-        
+
         [HttpGet("reserved")]
         public async Task<ActionResult<IReadOnlyList<string>>> GetReservedSlots([FromQuery] string trainerName, [FromQuery] string date)
         {
@@ -162,11 +162,9 @@ namespace API.Controllers
             if (!allowed.Contains(newStart.ToString("HH:mm")))
                 return BadRequest("Invalid slot. Allowed 08:00–18:00.");
 
-            var newTrainer = string.IsNullOrWhiteSpace(dto.TrainerName) ? reservation.TrainerName : dto.TrainerName;
-
             var conflict = await context.TrainingReservations.AnyAsync(x =>
                 x.Id != id &&
-                x.TrainerName == newTrainer &&
+                x.TrainerName == reservation.TrainerName &&
                 x.Date == newDate &&
                 x.StartTime == newStart
             );
@@ -174,7 +172,6 @@ namespace API.Controllers
             if (conflict)
                 return Conflict("This time slot is already reserved.");
 
-            reservation.TrainerName = newTrainer;
             reservation.Date = newDate;
             reservation.StartTime = newStart;
             reservation.EndTime = newStart.AddMinutes(60);

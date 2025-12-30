@@ -46,7 +46,6 @@ export class MyReservations implements OnInit {
   private fb = inject(FormBuilder);
 
   protected updateForm = this.fb.nonNullable.group({
-    trainerName: ['', Validators.required],
     date: ['', Validators.required],
     startTime: ['', Validators.required]
   });
@@ -73,7 +72,7 @@ export class MyReservations implements OnInit {
     this.loadReservations();
 
     this.updateForm.valueChanges.subscribe(v => {
-      const trainer = v.trainerName;
+      const trainer = this.selectedReservation()?.trainerName;
       const date = v.date;
 
       if (!trainer || !date) {
@@ -162,7 +161,6 @@ export class MyReservations implements OnInit {
     this.selectedReservation.set(r);
 
     this.updateForm.patchValue({
-      trainerName: r.trainerName,
       date: r.date,
       startTime: r.startTime
     });
@@ -182,7 +180,6 @@ export class MyReservations implements OnInit {
     this.updating.set(false);
 
     this.updateForm.reset({
-      trainerName: '',
       date: '',
       startTime: ''
     });

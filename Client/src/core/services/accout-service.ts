@@ -24,6 +24,13 @@ export class AccoutService {
     )
   }
 
+  emailExists(email: string) {
+  return this.http.get<boolean>(this.baseUrl + 'account/email-exists', {
+    params: { email }
+  });
+}
+
+
   login(creds: LoginCreds) {
     return this.http.post<User>(this.baseUrl + 'account/login', creds).pipe(
       tap(user => {

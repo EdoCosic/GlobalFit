@@ -14,7 +14,7 @@ export class TrainingReservationsService {
     return this.http.delete(`${this.apiBase}/${id}`);
   }
 
-  updateReservation(id: number, payload: { trainerName: string; date: string; startTime: string }) {
+  updateReservation(id: number, payload: {date: string; startTime: string }) {
     return this.http.put<void>(`${this.apiBase}/${id}`, payload);
   }
   getReservedSlots(trainerName: string, date: string) {

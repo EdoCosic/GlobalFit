@@ -50,6 +50,16 @@ public class AccountController(UserManager<AppUser> userManager, ITokenService t
         return await user.ToDto(tokenService);
     }
 
+    [HttpGet("email-exists")]
+    public async Task<ActionResult<bool>> EmailExists([FromQuery] string email)
+    {
+        if (string.IsNullOrWhiteSpace(email)) return false;
+
+        var exists = await userManager.Users.AnyAsync(x => x.Email == email);
+        return exists;
+    }
+
+
     [HttpPost("login")]
     [AllowAnonymous]
     public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
@@ -65,7 +75,7 @@ public class AccountController(UserManager<AppUser> userManager, ITokenService t
         return await user.ToDto(tokenService);
     }
 
-    
+
     [HttpPost("logout")]
     [Authorize]
     public IActionResult Logout()
