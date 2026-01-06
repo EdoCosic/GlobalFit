@@ -28,4 +28,21 @@
     @if (control.hasError('passwordMismatch') && control.touched){
     <div class="validation-hint text-error text-xs">Passwords do not match</div>
     }
+    @if (showStrength() && type() === 'password' && control.value?.length > 0) {
+    <div class="mt-2">
+        <div class="flex items-center justify-between text-xs">
+            <span class="opacity-70">Password strength</span>
+
+            <span class="font-semibold" [class.text-error]="passwordStrength.score <= 1"
+                [class.text-warning]="passwordStrength.score === 2" [class.text-success]="passwordStrength.score >= 3">
+                {{ passwordStrength.label }}
+            </span>
+        </div>
+
+        <progress class="progress w-full mt-1" [class.progress-error]="passwordStrength.score <= 1"
+            [class.progress-warning]="passwordStrength.score === 2"
+            [class.progress-success]="passwordStrength.score >= 3" [value]="passwordStrength.percent"
+            max="100"></progress>
+    </div>
+    }
 </label>
